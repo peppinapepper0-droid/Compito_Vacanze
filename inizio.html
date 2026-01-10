@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Livescore Ping Pong</title>
+
+</head>
+
+<body>
+
+<h1>Livescore Ping Pong</h1>
+<h3>Partite in corso</h3>
+
+<! PER SINGOLA PARTITA>
+
+<div style="display: flex; align-items: flex-start; gap: 30px; margin-bottom: 20px;">
+  <div style="display: flex; flex-direction: column; align-items: center;">
+    <strong>Mango</strong>
+    <div style="display: flex; flex-direction: column; gap: 5px;">
+      <span>5</span> <! nr. set>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+    <span style="font-size: 24px;">🏓</span>
+    <span id="timer">00:00</span>
+    <button onclick="info.html`" >Dettagli</button>
+  </div>
+  <div style="display: flex; flex-direction: column; align-items: center;">
+    <strong>Mela</strong>
+    <div style="display: flex; flex-direction: column; gap: 5px;">
+      <span>1</span> <! nr. set>
+    </div>
+  </div>
+</div>
+
+
+<div style="display: flex; align-items: flex-start; gap: 30px; margin-bottom: 20px;">
+  <div style="display: flex; flex-direction: column; align-items: center;">
+    <strong>Mango</strong>
+    <div style="display: flex; flex-direction: column; gap: 5px;">
+      <span>5</span> <! nr. set>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+    <span style="font-size: 24px;">🏓</span>
+    <span id="timer2">00:00</span>
+    <button onclick="info.html`" >Dettagli</button>
+  </div>
+  <div style="display: flex; flex-direction: column; align-items: center;">
+    <strong>Mela</strong>
+    <div style="display: flex; flex-direction: column; gap: 5px;">
+      <span>1</span> <! nr. set>
+    </div>
+  </div>
+</div>
+
+
+
+<div style="display: flex; align-items: flex-start; gap: 30px; margin-bottom: 20px;">
+  <div style="display: flex; flex-direction: column; align-items: center;">
+    <strong>Mango</strong>
+    <div style="display: flex; flex-direction: column; gap: 5px;">
+      <span>5</span> <! nr. set>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+    <span style="font-size: 24px;">🏓</span>
+    <span id="timer3">00:00</span>
+    <button onclick="info.html`" >Dettagli</button>
+  </div>
+  <div style="display: flex; flex-direction: column; align-items: center;">
+    <strong>Mela</strong>
+    <div style="display: flex; flex-direction: column; gap: 5px;">
+      <span>1</span> <! nr. set>
+    </div>
+  </div>
+</div>
+
+
+
+<div style="display: flex; align-items: flex-start; gap: 30px; margin-bottom: 20px;">
+  <div style="display: flex; flex-direction: column; align-items: center;">
+    <strong>Mango</strong>
+    <div style="display: flex; flex-direction: column; gap: 5px;">
+      <span>5</span> <! nr. set>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+    <span style="font-size: 24px;">🏓</span>
+    <span id="timer4">00:00</span>
+    <button onclick="info.html`" >Dettagli</button>
+  </div>
+  <div style="display: flex; flex-direction: column; align-items: center;">
+    <strong>Mela</strong>
+    <div style="display: flex; flex-direction: column; gap: 5px;">
+      <span>1</span> <! nr. set>
+    </div>
+  </div>
+</div>
+
+
+
+<div style="display: flex; align-items: flex-start; gap: 30px; margin-bottom: 20px;">
+  <div style="display: flex; flex-direction: column; align-items: center;">
+    <strong>Mango</strong>
+    <div style="display: flex; flex-direction: column; gap: 5px;">
+      <span>5</span> <! nr. set>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+    <span style="font-size: 24px;">🏓</span>
+    <span id="timer5">00:00</span>
+    <button onclick="info.html`" >Dettagli</button>
+  </div>
+  <div style="display: flex; flex-direction: column; align-items: center;">
+    <strong>Mela</strong>
+    <div style="display: flex; flex-direction: column; gap: 5px;">
+      <span>1</span> <! nr. set>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  const ws = new WebSocket('ws://localhost:8080');
+
+  ws.onopen = () => {
+    console.log('Connesso al server WebSocket');
+  };
+
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    const min = String(Math.floor(data.seconds / 60)).padStart(2, "0");
+    const sec = String(data.seconds % 60).padStart(2, "0");
+    document.getElementById("timer").innerText = `${min}:${sec}`;
+  };
+
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    const min = String(Math.floor(data.seconds / 60)).padStart(2, "0");
+    const sec = String(data.seconds % 60).padStart(2, "0");
+    document.getElementById("timer2").innerText = `${min}:${sec}`;
+  };
+
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    const min = String(Math.floor(data.seconds / 60)).padStart(2, "0");
+    const sec = String(data.seconds % 60).padStart(2, "0");
+    document.getElementById("timer3").innerText = `${min}:${sec}`;
+  };
+
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    const min = String(Math.floor(data.seconds / 60)).padStart(2, "0");
+    const sec = String(data.seconds % 60).padStart(2, "0");
+    document.getElementById("timer4").innerText = `${min}:${sec}`;
+  };
+
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    const min = String(Math.floor(data.seconds / 60)).padStart(2, "0");
+    const sec = String(data.seconds % 60).padStart(2, "0");
+    document.getElementById("timer5").innerText = `${min}:${sec}`;
+  };
+
+
+  ws.onclose = () => {
+    console.log('Connessione chiusa');
+  };
+  </script>
+
+
