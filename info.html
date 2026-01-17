@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ping Pong Live - Dettagli</title>
+    <style>
+        /* Stili semplici e chiari */
+        body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #111; color: #f5f5f5; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        .subtitle { color: #bdbdbd; font-size: 13px; margin-bottom: 12px; }
+        .header { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+        .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .players { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; text-align: center; }
+        .player { font-weight: 700; font-size: 20px; }
+        .score { font-size: 24px; font-weight: 800; color: #2ecc71; }
+        .badge { font-size: 11px; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; border: 1px solid #333; }
+        .badge.live { background: #3a1e22; color: #ff6b6b; border-color: #ff6b6b; }
+        .badge.programmato { background: #1c2a3a; color: #6ab0ff; border-color: #6ab0ff; }
+        .badge.terminato { background: #202728; color: #a0b3ba; border-color: #a0b3ba; }
+        .meta { color: #bdbdbd; font-size: 13px; }
+        .meta strong { color: #f5f5f5; }
+
+        .card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+        .sets-list { display: grid; gap: 8px; }
+        .set-row { display: grid; grid-template-columns: 120px 1fr; align-items: center; gap: 10px; background: #171717; border: 1px solid #2a2a2a; border-radius: 8px; padding: 8px 10px; }
+        .set-row.current { border-left: 4px solid #2ecc71; background: #17241b; }
+        .set-score { display: flex; align-items: center; justify-content: center; gap: 14px; font-size: 18px; }
+        .num { font-weight: 800; min-width: 28px; text-align: center; }
+        .num.win { color: #2ecc71; }
+
+        .btn { background: #00d4ff; color: #00111a; border: none; padding: 8px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .footer { display: flex; justify-content: center; margin-top: 12px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 style="margin:0 0 8px; font-size:22px;">Ping Pong Live</h1>
+    <div class="subtitle">Dettagli incontro con aggiornamenti in tempo reale</div>
+
+    <div class="header">
+        <div class="players">
+            <div id="player1" class="player">-</div>
+            <div>
+                <div style="color:#bdbdbd; font-weight:700;">vs</div>
+                <div class="score"><span id="setsP1">0</span> - <span id="setsP2">0</span></div>
+            </div>
+            <div id="player2" class="player">-</div>
+        </div>
+        <div class="row" style="margin-top:8px;">
+            <span id="stato" class="badge">-</span>
+            <span class="meta">Inizio: <strong id="scheduled">-</strong></span>
+            <span class="meta">Durata: <strong id="time">00:00:00</strong></span>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="meta" style="margin-bottom:6px;">Punteggi per set</div>
+        <div id="sets" class="sets-list"></div>
+    </div>
+
+    <div class="footer">
+        <button class="btn" onclick="window.location.href='/'">← Torna alle partite</button>
+    </div>
+</div>
+
+<script>
+    // Legge l'id della partita dalla query string: info.html?match=ID
+    const params = new URLSearchParams(window.location.search);
+    const matchId = params.get('match');
+    if (!matchId) { window.location.href = '/'; }
+
+    // WebSocket per ricevere aggiornamenti
+    const ws = new WebSocket('ws://localhost:8888/ws');
+
+    ws.onopen = () => {
+        // Richiede i dati della partita selezionata
+        ws.send(JSON.stringify({ action: 'getMatch', matchId }));
+    };
+
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.matchId !== matchId) return; // ignora altri match
+
+        // Aggiorna intestazione
+        document.getElementById('player1').innerText = data.player1 || '';
+        document.getElementById('player2').innerText = data.player2 || '';
+        document.getElementById('setsP1').innerText = data.setsP1 ?? 0;
+        document.getElementById('setsP2').innerText = data.setsP2 ?? 0;
+        document.getElementById('time').innerText = data.time || '00:00:00';
+        document.getElementById('scheduled').innerText = data.scheduledAt || '-';
+
+        const stato = document.getElementById('stato');
+        stato.textContent = data.stato;
+        stato.className = `badge ${data.stato}`;
+
+        // Aggiorna lista set solo quando il server manda i dettagli set
+        if (data.sets) renderSets(data);
+    };
+
+    ws.onerror = (e) => console.error('Errore WebSocket', e);
+
+    // Crea i 5 blocchi dei set, evidenziando quello in corso
+    function renderSets(data) {
+        const root = document.getElementById('sets');
+        root.innerHTML = '';
+        for (let i = 1; i <= 5; i++) {
+            const s = data.sets[`set${i}`];
+            if (!s) continue;
+            const row = document.createElement('div');
+            const isCurrent = data.current && data.current.setNumber === i;
+            const p1Win = s.completed && s.p1 > s.p2;
+            const p2Win = s.completed && s.p2 > s.p1;
+            row.className = 'set-row' + (isCurrent ? ' current' : '');
+            row.innerHTML = `
+                <div class="meta">Set ${i}${isCurrent ? ' (in corso)' : ''}</div>
+                <div class="set-score">
+                    <span class="num ${p1Win ? 'win' : ''}">${s.p1}</span>
+                    <span class="meta">-</span>
+                    <span class="num ${p2Win ? 'win' : ''}">${s.p2}</span>
+                </div>
+            `;
+            root.appendChild(row);
+        }
+    }
+</script>
+</body>
+</html>
