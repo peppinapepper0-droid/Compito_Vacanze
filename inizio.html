@@ -36,13 +36,13 @@
 </div>
 
 <script>
-    // Connessione WebSocket al server (porta 8888)
+    <!-- Connessione WebSocket al server (porta 8888) -->
     const ws = new WebSocket('ws://localhost:8888/ws');
 
-    // Dizionario con i dati delle partite: { matchId: dati }
+    <!-- Dizionario con i dati delle partite: { matchId: dati } -->
     const matches = {};
 
-    // Ogni messaggio aggiorna/aggiunge una partita e ridisegna la lista
+    <!-- Ogni messaggio aggiorna/aggiunge una partita e ridisegna la lista -->
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         matches[data.matchId] = data;
@@ -51,13 +51,13 @@
 
     ws.onerror = (e) => console.error('Errore WebSocket', e);
 
-    // Disegna le card in pagina in modo semplice
+    <!-- Disegna le card in pagina in modo semplice -->
     function render() {
         const container = document.getElementById('matches-container');
         container.innerHTML = '';
 
         const order = { live: 1, programmato: 2, terminato: 3 };
-        // sottrazioni del valore di prorità delle partite, per ordinarle in modo di avere prima le live poi le programmate e infine le terminate
+        <!-- sottrazioni del valore di prorità delle partite, per ordinarle in modo di avere prima le live poi le programmate e infine le terminate -->
         const list = Object.entries(matches).sort((a, b) => order[a[1].stato] - order[b[1].stato]);
 
         list.forEach(([matchId, m]) => {
@@ -65,21 +65,21 @@
             card.className = 'card';
 
             const scheduled = m.scheduledAt ? `Inizio: <strong>${m.scheduledAt}</strong>` : '';
-            const durationLabel = m.stato === 'programmato' ? 'Durata prevista' : 'Durata';
+            const durationLabel = m.stato === 'programmato' ? 'Ore' : 'Durata';
             const time = m.time || '00:00:00';
 
             card.innerHTML = `
-                <div class="row">  // prima riga del rettangolo di una partita
+                <div class="row">  <!-- prima riga del rettangolo di una partita -->
                     <span class="badge ${m.stato}">${m.stato}</span>
                     <button class="btn" onclick="window.location.href='info.html?match=${matchId}'">Dettagli</button>
                 </div>
-                <div class="row"> //due rige sotto con i plyer e i loro punteggi
+                <div class="row"> <!-- due rige sotto con i plyer e i loro punteggi -->
                     <div class="names">
                         <div class="player"><span class="name">${m.player1 || ''}</span><span class="sets">${m.setsP1 ?? 0}</span></div>
                         <div class="player"><span class="name">${m.player2 || ''}</span><span class="sets">${m.setsP2 ?? 0}</span></div>
                     </div>
                 </div>
-                <div class="row"> // ultima riga con inizio partita e durata prevista (inizializzate dentro a questo stesso for)
+                <div class="row"> <!-- ultima riga con inizio partita e durata prevista (inizializzate dentro a questo stesso for) -->
                     <div class="meta">${scheduled}</div>
                     <div class="meta">${durationLabel}: <strong>${time}</strong></div>
                 </div>

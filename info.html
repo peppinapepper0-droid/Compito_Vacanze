@@ -65,26 +65,27 @@
 </div>
 
 <script>
-    // Legge l'id della partita dalla query string: info.html?match=ID
+    <!-- Legge l'id della partita dalla query string: info.html?match=ID -->
     const params = new URLSearchParams(window.location.search);
     const matchId = params.get('match');
     if (!matchId) { window.location.href = '/'; }
 
-    // WebSocket per ricevere aggiornamenti
+    <!-- WebSocket per ricevere aggiornamenti -->
     const ws = new WebSocket('ws://localhost:8888/ws');
 
     ws.onopen = () => {
-        // Richiede i dati della partita selezionata
+        <!-- Richiede i dati della partita selezionata -->
         ws.send(JSON.stringify({ action: 'getMatch', matchId }));
     };
 
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        if (data.matchId !== matchId) return; // ignora altri match
+        if (data.matchId !== matchId) return; <!-- ignora altri match -->
 
-        // Aggiorna intestazione
-        // "||" inidica che se player1 non esiste mette stringa vuota
-        //"??" se setP1 è null o unidentified mette 0
+        <!-- Aggiorna intestazione -->
+        <!--  "||" inidica che se player1 non esiste mette stringa vuota -->
+        <!--  "??" se setP1 è null o unidentified mette 0 -->
+
 
         document.getElementById('player1').innerText = data.player1 || '';
         document.getElementById('player2').innerText = data.player2 || '';
@@ -95,15 +96,15 @@
 
         const stato = document.getElementById('stato');
         stato.textContent = data.stato;
-        stato.className = `badge ${data.stato}`; // viene assegnato lo stile alla partita in base al data.stato
+        stato.className = `badge ${data.stato}`; <!-- viene assegnato lo stile alla partita in base al data.stato -->
 
-        // per fare in modo che la pagina venga aggiornata quando arrivano tutti i dati della partita
+        <!-- per fare in modo che la pagina venga aggiornata quando arrivano tutti i dati della partita -->
         if (data.sets) renderSets(data);
     };
 
     ws.onerror = (e) => console.error('Errore WebSocket', e);
 
-    // Crea i 5 blocchi dei set, evidenziando quello in corso
+    <!-- Crea i 5 blocchi dei set, evidenziando quello in corso -->
     function renderSets(data) {
         const root = document.getElementById('sets');
         root.innerHTML = '';
@@ -111,13 +112,13 @@
             const s = data.sets[`set${i}`];
             if (!s) continue;
             const row = document.createElement('div');
-            const isCurrent = data.current && data.current.setNumber === i; //se il set che stiamo controllando è uguale al set che vogliamo modificare allora isCurrent=set
+            const isCurrent = data.current && data.current.setNumber === i; <!-- se il set che stiamo controllando è uguale al set che vogliamo modificare allora isCurrent=set -->
             const p1Win = s.completed && s.p1 > s.p2;
             const p2Win = s.completed && s.p2 > s.p1;
-            row.className = 'set-row' + (isCurrent ? ' current' : ''); // o stile set-row o stile isCurrent (quindi verde)
+            row.className = 'set-row' + (isCurrent ? ' current' : ''); <!-- o stile set-row o stile isCurrent (quindi verde) -->
             row.innerHTML = `
-                <div class="meta">Set ${i}${isCurrent ? ' (in corso)' : ''}</div> //se è il set corrente, gli viene scritto vicino "(in corso)"
-                <div class="set-score">  //queste righe servono per mettere il numero dei punti verdi del giocatore che ha vinto il set
+                <div class="meta">Set ${i}${isCurrent ? ' (in corso)' : ''}</div> <!-- se è il set corrente, gli viene scritto vicino "(in corso)" -->
+                <div class="set-score">  <!-- queste righe servono per mettere il numero dei punti verdi del giocatore che ha vinto il set -->
                     <span class="num ${p1Win ? 'win' : ''}">${s.p1}</span>
                     <span class="meta">-</span>
                     <span class="num ${p2Win ? 'win' : ''}">${s.p2}</span>
@@ -128,4 +129,3 @@
     }
 </script>
 </body>
-</html>
