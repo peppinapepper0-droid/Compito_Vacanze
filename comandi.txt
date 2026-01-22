@@ -1,6 +1,6 @@
 -entrare nella cartella Compito_Vacanze
 -aprire la cartella sul terminale
--docker build -t compito_vacanze .
+-docker build -t compito_vacanze:latest
 -avviare l'applicazione
-- docker run --name compito_vacanze --rm -p 8888:8888 compito_vacanze
+- docker run --name compito_vacanze --rm -p 8888:8888 compito_vacanze:latest
 - se non appare il link, aprire il browser all'url: http://localhost:8888
